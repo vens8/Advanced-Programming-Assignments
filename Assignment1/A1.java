@@ -57,6 +57,7 @@ public class A1 {
                 System.out.print("Enter your choice: ");
                 x = sc.nextInt();
             } else if (x == 6) {
+                list_slots();
                 menu();
                 System.out.print("Enter your choice: ");
                 x = sc.nextInt();
@@ -107,7 +108,7 @@ public class A1 {
 
         if (!citizen_exists) {
             System.out.print("Invalid ID. Citizen not registered.\n");
-            book_slots();
+            return;
         }
 
         System.out.println("""
@@ -116,6 +117,7 @@ public class A1 {
                 3. Exit""");
         System.out.print("Enter option: ");
         int choice = sc.nextInt();
+
         if (choice == 1) {
             System.out.print("Enter pincode: ");
             int pincode = sc.nextInt();
@@ -125,7 +127,7 @@ public class A1 {
                 if (hospital.pincode == pincode) {
                     pincode_exists = true;
                     System.out.print("Hospital ID: " + hospital.unique_id + "\n");
-                    matches.add(unique_id);
+                    matches.add(hospital.unique_id);
                     System.out.print("Hospital Name: " + hospital.hospital_name);
                     System.out.println();
                 }
@@ -144,29 +146,121 @@ public class A1 {
                                 System.out.print("      Vaccine: " + slots.get(i).vaccine + "\n");
                             }
                         }
-                    System.out.print("Choose slot: ");
-                    int slot_index = sc.nextInt(), vaccine_index = 0;
-                    for (int j = 0; j < vaccines.size(); j++) {
-                        if (vaccines.get(j).vaccine_name.equals(slots.get(slot_index).vaccine)) {
-                            vaccine_index = j;
-                            break;
-                        }
                     }
-                    citizens.get(citizen_index).vaccine = vaccines.get(vaccine_index).vaccine_name;
-                    citizens.get(citizen_index).doses = vaccines.get(vaccine_index).doses - 1;
-                    citizens.get(citizen_index).next_dose = vaccines.get(vaccine_index).dose_gap;
+                    if (slot_exists) {
+                        System.out.print("Choose slot: ");
+                        int slot_index = sc.nextInt(), vaccine_index = 0;
+                        for (int j = 0; j < vaccines.size(); j++) {
+                            if (vaccines.get(j).vaccine_name.equals(slots.get(slot_index).vaccine)) {
+                                vaccine_index = j;
+                                break;
+                            }
+                        }
+                        citizens.get(citizen_index).vaccine = vaccines.get(vaccine_index).vaccine_name;
+                        citizens.get(citizen_index).doses = vaccines.get(vaccine_index).doses - 1;
+                        citizens.get(citizen_index).next_dose = vaccines.get(vaccine_index).dose_gap;
 
-                    if (vaccines.get(vaccine_index).doses == 1)
-                        citizens.get(citizen_index).vaccination_status = "Fully Vaccinated";
+                        if (vaccines.get(vaccine_index).doses == 1)
+                            citizens.get(citizen_index).vaccination_status = "Fully Vaccinated";
+                        else
+                            citizens.get(citizen_index).vaccination_status = "Partially Vaccinated";
+                        System.out.print(citizens.get(citizen_index).citizen_name + " has been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
+                    }
                     else
-                        citizens.get(citizen_index).vaccination_status = "Partially Vaccinated";
-                    System.out.print(citizens.get(citizen_index).citizen_name + "has been vaccinated with " + citizens.get(citizen_index).vaccine);
+                        System.out.print("No slots available.\n");
+                }
+            }
+            else
+                System.out.print("Invalid pincode.\n");
+        }
+        else if (choice == 2) {
+            System.out.print("Enter vaccine name: ");
+            sc.nextLine();
+            String vaccine = sc.nextLine();
+            boolean vaccine_exists = false;
+            ArrayList<String> matches = new ArrayList<>();  // Add add hospital ids related to a pincode
+
+            for (A1.add_slot.days slots : slots) {
+                if (slots.vaccine.equals(vaccine)) {
+                    vaccine_exists = true;
+                    for (A1.hospital hospital : hospitals) {
+                        if (slots.hospital_id().equals(hospital.unique_id)) {
+                            System.out.print("Hospital ID: " + slots.hospital_id() + "\n");
+                            matches.add(hospital.unique_id);
+                            System.out.print("Hospital Name: " + slots.hospital_name());
+                            System.out.println();
+                        }
                     }
                 }
             }
+            if (vaccine_exists) {
+                System.out.print("Enter the hospital ID: ");
+                String hospital_id = sc.next();
+                if (matches.contains(hospital_id)) {
+                    boolean slot_exists = false;
+                    for (int i = 0; i < slots.size(); i++) {
+                        if (slots.get(i).hospital_id().equals(hospital_id) && slots.get(i).vaccine.equals(vaccine)) {
+                            if (slots.get(i).quantity > 0) {
+                                slot_exists = true;
+                                System.out.print("Option " + i + " -> Day " + slots.get(i).day_no + "\n");
+                                System.out.print("      Quantity: " + slots.get(i).quantity + " (Available)\n");
+                                System.out.print("      Vaccine: " + slots.get(i).vaccine + "\n");
+                            }
+                        }
+                    }
+                    if (slot_exists) {
+                        System.out.print("Choose slot: ");
+                        int slot_index = sc.nextInt(), vaccine_index = 0;
+                        for (int j = 0; j < vaccines.size(); j++) {
+                            if (vaccines.get(j).vaccine_name.equals(slots.get(slot_index).vaccine)) {
+                                vaccine_index = j;
+                                break;
+                            }
+                        }
+                        citizens.get(citizen_index).vaccine = vaccines.get(vaccine_index).vaccine_name;
+                        citizens.get(citizen_index).doses = vaccines.get(vaccine_index).doses - 1;
+                        citizens.get(citizen_index).next_dose = vaccines.get(vaccine_index).dose_gap;
+
+                        if (vaccines.get(vaccine_index).doses == 1)
+                            citizens.get(citizen_index).vaccination_status = "Fully Vaccinated";
+                        else
+                            citizens.get(citizen_index).vaccination_status = "Partially Vaccinated";
+                        System.out.print(citizens.get(citizen_index).citizen_name + " has been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
+                    }
+                    else
+                        System.out.print("No slots available.\n");
+                }
+                else
+                    System.out.print("Hospital ID mismatch.\n");
+            }
+            else
+                System.out.print("Vaccine not available.\n");
         }
     }
 
+    public static void list_slots() {
+        System.out.print("Enter the hospital ID: ");
+        String hospital_id = sc.next();
+        boolean slot_exists = false;
+        for (add_slot.days slot : slots) {
+            if (slot.hospital_id().equals(hospital_id)) {
+                slot_exists = true;
+                if (slot.quantity > 0) {
+                    System.out.print("Day " + slot.day_no + "\n");
+                    System.out.print("      Quantity: " + slot.quantity + " (Available)\n");
+                    System.out.print("      Vaccine: " + slot.vaccine + "\n");
+                }
+                else {
+                    System.out.print("Day " + slot.day_no + "\n");
+                    System.out.print("      Quantity: " + 0 + " (Not Available)\n");
+                    System.out.print("      Vaccine: " + slot.vaccine + "\n");
+                }
+            }
+        }
+        if (!slot_exists)
+            System.out.print("No slots available.\n");
+
+    }
 
     public static class vaccine {
         String vaccine_name;
@@ -279,8 +373,9 @@ public class A1 {
 
             public void display() {
                 System.out.println("\nFollowing slot added!");
-                System.out.println("Hospital Name: " + hospital_id);
+                System.out.println("Hospital ID: " + hospital_id);
                 System.out.println("Day: " + day_no);
+                System.out.println("Quantity: " + quantity);
                 System.out.println("Vaccine: " + vaccine);
             }
             public String hospital_id() {
@@ -288,6 +383,13 @@ public class A1 {
             }
             public int slots() {
                 return slots;
+            }
+            public String hospital_name() {
+                for(A1.hospital hospital : hospitals) {
+                    if (hospital.unique_id.equals(hospital_id))
+                        return hospital.hospital_name;
+                }
+                return "NULL";  // Dummy - this return statement is never reached.
             }
 
         }
