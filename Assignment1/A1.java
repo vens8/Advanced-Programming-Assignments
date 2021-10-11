@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -159,10 +158,12 @@ public class A1 {
                 String hospital_id = sc.next();
                 if (matches.contains(hospital_id)) {
                     boolean slot_exists = false;
+                    ArrayList<Integer> slot_options = new ArrayList<>();
                     for (int i = 0; i < slots.size(); i++) {
                         if (slots.get(i).hospital_id.equalsIgnoreCase(hospital_id)) {
                             if (slots.get(i).quantity > 0) {
                                 slot_exists = true;
+                                slot_options.add(i);
                                 System.out.print("Option " + i + " -> Day " + slots.get(i).day_no + "\n");
                                 System.out.print("      Quantity: " + slots.get(i).quantity + " (Available)\n");
                                 System.out.print("      Vaccine: " + slots.get(i).vaccine + "\n");
@@ -172,32 +173,35 @@ public class A1 {
                     if (slot_exists) {
                         System.out.print("Choose slot: ");
                         int slot_index = sc.nextInt(), vaccine_index = 0;
-                        for (int j = 0; j < vaccines.size(); j++) {
-                            if (vaccines.get(j).vaccine_name.equalsIgnoreCase(slots.get(slot_index).vaccine)) {
-                                vaccine_index = j;
-                                break;
+                        if (slot_options.contains(slot_index)) {
+                            for (int j = 0; j < vaccines.size(); j++) {
+                                if (vaccines.get(j).vaccine_name.equalsIgnoreCase(slots.get(slot_index).vaccine)) {
+                                    vaccine_index = j;
+                                    break;
+                                }
                             }
-                        }
-                        if (citizens.get(citizen_index).vaccine.equals(slots.get(slot_index).vaccine) || citizens.get(citizen_index).vaccination_status.equals("Registered")) {
-                            citizens.get(citizen_index).vaccine = vaccines.get(vaccine_index).vaccine_name;
-                            ++citizens.get(citizen_index).doses;
+                            if (citizens.get(citizen_index).vaccine.equals(slots.get(slot_index).vaccine) || citizens.get(citizen_index).vaccination_status.equals("Registered")) {
+                                citizens.get(citizen_index).vaccine = vaccines.get(vaccine_index).vaccine_name;
+                                ++citizens.get(citizen_index).doses;
 
-                            if (vaccines.get(vaccine_index).doses == citizens.get(citizen_index).doses) {
-                                citizens.get(citizen_index).vaccination_status = "Fully Vaccinated";
-                                citizens.get(citizen_index).next_dose = 0;
+                                if (vaccines.get(vaccine_index).doses == citizens.get(citizen_index).doses) {
+                                    citizens.get(citizen_index).vaccination_status = "Fully Vaccinated";
+                                    citizens.get(citizen_index).next_dose = 0;
+                                } else {
+                                    citizens.get(citizen_index).vaccination_status = "Partially Vaccinated";
+                                    citizens.get(citizen_index).next_dose = vaccines.get(vaccine_index).dose_gap + slots.get(slot_index).day_no;
+                                }
+                                --slots.get(slot_index).quantity;
+                                if (slots.get(slot_index).quantity <= 0) {
+                                    slots.remove(slot_index);
+                                }
+                                System.out.print(citizens.get(citizen_index).citizen_name + " has been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
                             } else {
-                                citizens.get(citizen_index).vaccination_status = "Partially Vaccinated";
-                                citizens.get(citizen_index).next_dose = vaccines.get(vaccine_index).dose_gap + slots.get(slot_index).day_no;
+                                System.out.print("Cannot book this slot. You have previously been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
                             }
-                            --slots.get(slot_index).quantity;
-                            if (slots.get(slot_index).quantity <= 0) {
-                                slots.remove(slot_index);
-                            }
-                            System.out.print(citizens.get(citizen_index).citizen_name + " has been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
                         }
-                        else {
-                            System.out.print("Cannot book this slot. You have previously been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
-                        }
+                        else
+                            System.out.print("Invalid option. Please choose from the available slot options.\n");
                     }
                     else
                         System.out.print("No slots available.\n");
@@ -231,10 +235,12 @@ public class A1 {
                 String hospital_id = sc.next();
                 if (matches.contains(hospital_id)) {
                     boolean slot_exists = false;
+                    ArrayList<Integer> slot_options = new ArrayList<>();
                     for (int i = 0; i < slots.size(); i++) {
                         if (slots.get(i).hospital_id.equalsIgnoreCase(hospital_id) && slots.get(i).vaccine.equalsIgnoreCase(vaccine)) {
                             if (slots.get(i).quantity > 0) {
                                 slot_exists = true;
+                                slot_options.add(i);
                                 System.out.print("Option " + i + " -> Day " + slots.get(i).day_no + "\n");
                                 System.out.print("      Quantity: " + slots.get(i).quantity + " (Available)\n");
                                 System.out.print("      Vaccine: " + slots.get(i).vaccine + "\n");
@@ -244,32 +250,35 @@ public class A1 {
                     if (slot_exists) {
                         System.out.print("Choose slot: ");
                         int slot_index = sc.nextInt(), vaccine_index = 0;
-                        for (int j = 0; j < vaccines.size(); j++) {
-                            if (vaccines.get(j).vaccine_name.equalsIgnoreCase(slots.get(slot_index).vaccine)) {
-                                vaccine_index = j;
-                                break;
+                        if (slot_options.contains(slot_index)) {
+                            for (int j = 0; j < vaccines.size(); j++) {
+                                if (vaccines.get(j).vaccine_name.equalsIgnoreCase(slots.get(slot_index).vaccine)) {
+                                    vaccine_index = j;
+                                    break;
+                                }
                             }
-                        }
-                        if (citizens.get(citizen_index).vaccine.equals(slots.get(slot_index).vaccine) || citizens.get(citizen_index).vaccination_status.equals("Registered")) {
-                            citizens.get(citizen_index).vaccine = vaccines.get(vaccine_index).vaccine_name;
-                            ++citizens.get(citizen_index).doses;
+                            if (citizens.get(citizen_index).vaccine.equals(slots.get(slot_index).vaccine) || citizens.get(citizen_index).vaccination_status.equals("Registered")) {
+                                citizens.get(citizen_index).vaccine = vaccines.get(vaccine_index).vaccine_name;
+                                ++citizens.get(citizen_index).doses;
 
-                            if (vaccines.get(vaccine_index).doses == citizens.get(citizen_index).doses) {
-                                citizens.get(citizen_index).vaccination_status = "Fully Vaccinated";
-                                citizens.get(citizen_index).next_dose = 0;
+                                if (vaccines.get(vaccine_index).doses == citizens.get(citizen_index).doses) {
+                                    citizens.get(citizen_index).vaccination_status = "Fully Vaccinated";
+                                    citizens.get(citizen_index).next_dose = 0;
+                                } else {
+                                    citizens.get(citizen_index).vaccination_status = "Partially Vaccinated";
+                                    citizens.get(citizen_index).next_dose = vaccines.get(vaccine_index).dose_gap + slots.get(slot_index).day_no;
+                                }
+                                --slots.get(slot_index).quantity;
+                                if (slots.get(slot_index).quantity <= 0) {
+                                    slots.remove(slot_index);
+                                }
+                                System.out.print(citizens.get(citizen_index).citizen_name + " has been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
                             } else {
-                                citizens.get(citizen_index).vaccination_status = "Partially Vaccinated";
-                                citizens.get(citizen_index).next_dose = vaccines.get(vaccine_index).dose_gap + slots.get(slot_index).day_no;
+                                System.out.print("Cannot book this slot. You have previously been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
                             }
-                            --slots.get(slot_index).quantity;
-                            if (slots.get(slot_index).quantity <= 0) {
-                                slots.remove(slot_index);
-                            }
-                            System.out.print(citizens.get(citizen_index).citizen_name + " has been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
                         }
-                        else {
-                            System.out.print("Cannot book this slot. You have previously been vaccinated with " + citizens.get(citizen_index).vaccine + "\n");
-                        }
+                        else
+                            System.out.print("Invalid option. Please choose from the available slot options.\n");
                     }
                     else
                         System.out.print("No slots available.\n");
@@ -426,7 +435,6 @@ public class A1 {
         public static class days {
             int day_no, quantity = 0, slots;
             String vaccine, hospital_id;
-            //String vaccine_status;
 
             public days() {
                 System.out.print("Enter day number: ");
