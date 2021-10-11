@@ -1,22 +1,28 @@
-import java.util.*;
+/*
+AP Assignment 1
+ Rahul Maddula
+ 2020149
+*/
 
+import java.util.*;
+// While displaying hospital slots, display only unique hospital details.
 
 public class A1 {
     static Scanner sc = new Scanner(System.in);
 
-    static ArrayList<vaccine> vaccines = new ArrayList<>();
+    static ArrayList<vaccine> vaccines = new ArrayList<>();  // Store all objects of Vaccine class
 
-    static ArrayList<hospital> hospitals = new ArrayList<>();
-    static int hospital_id = 0;
+    static ArrayList<hospital> hospitals = new ArrayList<>();  // Store all objects of Hospital class
+    static int hospital_id = 0;  // For generating unique hospital id for each hospital
 
-    static ArrayList<citizen> citizens = new ArrayList<>();
+    static ArrayList<citizen> citizens = new ArrayList<>();  // Store all objects of Citizen class
 
-    static ArrayList<add_slot.days> slots = new ArrayList<>();
+    static ArrayList<add_slot.days> slots = new ArrayList<>();  // Store all objects of add_slots class
 
     public static void main(String[] args) {
         System.out.println("COVIN Portal initialized...");
-        menu();
 
+        menu();
         System.out.print("Enter your choice: ");
         String x = sc.next();
         while (true) {
@@ -162,11 +168,13 @@ public class A1 {
                     for (int i = 0; i < slots.size(); i++) {
                         if (slots.get(i).hospital_id.equalsIgnoreCase(hospital_id)) {
                             if (slots.get(i).quantity > 0) {
-                                slot_exists = true;
-                                slot_options.add(i);
-                                System.out.print("Option " + i + " -> Day " + slots.get(i).day_no + "\n");
-                                System.out.print("      Quantity: " + slots.get(i).quantity + " (Available)\n");
-                                System.out.print("      Vaccine: " + slots.get(i).vaccine + "\n");
+                                if (citizens.get(citizen_index).vaccination_status.equals("Registered") || citizens.get(citizen_index).vaccination_status.equals("Partially Vaccinated") && slots.get(i).day_no >= citizens.get(citizen_index).next_dose) {
+                                    slot_exists = true;
+                                    slot_options.add(i);
+                                    System.out.print("Option " + i + " -> Day " + slots.get(i).day_no + "\n");
+                                    System.out.print("      Quantity: " + slots.get(i).quantity + " (Available)\n");
+                                    System.out.print("      Vaccine: " + slots.get(i).vaccine + "\n");
+                                }
                             }
                         }
                     }
@@ -239,11 +247,13 @@ public class A1 {
                     for (int i = 0; i < slots.size(); i++) {
                         if (slots.get(i).hospital_id.equalsIgnoreCase(hospital_id) && slots.get(i).vaccine.equalsIgnoreCase(vaccine)) {
                             if (slots.get(i).quantity > 0) {
-                                slot_exists = true;
-                                slot_options.add(i);
-                                System.out.print("Option " + i + " -> Day " + slots.get(i).day_no + "\n");
-                                System.out.print("      Quantity: " + slots.get(i).quantity + " (Available)\n");
-                                System.out.print("      Vaccine: " + slots.get(i).vaccine + "\n");
+                                if (citizens.get(citizen_index).vaccination_status.equals("Registered") || citizens.get(citizen_index).vaccination_status.equals("Partially Vaccinated") && slots.get(i).day_no >= citizens.get(citizen_index).next_dose) {
+                                    slot_exists = true;
+                                    slot_options.add(i);
+                                    System.out.print("Option " + i + " -> Day " + slots.get(i).day_no + "\n");
+                                    System.out.print("      Quantity: " + slots.get(i).quantity + " (Available)\n");
+                                    System.out.print("      Vaccine: " + slots.get(i).vaccine + "\n");
+                                }
                             }
                         }
                     }
@@ -337,12 +347,14 @@ public class A1 {
             if(citizen.unique_id.equalsIgnoreCase(patient_id)) {
                 patient_exists = true;
                 System.out.print("\nPatient name: " + citizen.citizen_name + "\n");
-                System.out.print("Vaccination status: " + citizen.vaccination_status + "\n");
                 if (!citizen.vaccination_status.equalsIgnoreCase("Registered")) {
+                    System.out.print("Vaccination status: " + citizen.vaccination_status + "\n");
                     System.out.print("Vaccine given: " + citizen.vaccine + "\n");
                     System.out.print("Number of doses given: " + citizen.doses + "\n");
                     System.out.print("Next dose due date: " + citizen.next_dose + "\n");
                 }
+                else
+                    System.out.print("Vaccination status: Not Vaccinated\n");
             }
         }
         if(!patient_exists)
@@ -489,6 +501,12 @@ public class A1 {
                         days d = new days();
                         d.hospital_id = h_id;
                         d.slots = slots;
+                        for (A1.add_slot.days slot : A1.slots) {  // Check if a similar slot exists and add the quantity to it if found, else create a new slot
+                            if (slot.hospital_id.equals(d.hospital_id) && slot.day_no == d.day_no && d.vaccine.equalsIgnoreCase(slot.vaccine)) {
+                                slot.quantity += d.quantity;
+                                return;
+                            }
+                        }
                         A1.slots.add(d);
                     }
                 }
