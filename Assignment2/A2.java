@@ -9,39 +9,35 @@ import A1_2020149.A1;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.text.*;
 
 public class A2 {
     static Scanner scInt = new Scanner(System.in);
+    static Scanner scString = new Scanner(System.in);
     static ArrayList<instructor> instructors = new ArrayList<>();  // Store all objects of instructor class
     static ArrayList<student> students = new ArrayList<>();  // Store all objects of student class
-    static ArrayList<String> lecture_videos = new ArrayList<>();  // Store all objects of lecture videos
-    static ArrayList<String> lecture_materials = new ArrayList<>();  // Store all objects of lecture slides
+    static ArrayList<slide> slides = new ArrayList<>();  // Store all objects of slide class
+    static ArrayList<video> videos = new ArrayList<>();  // Store all objects of video class
 
-    interface instructor_interface {
-        void add_lecture_material();
-        void add_assessments();
+
+    interface backpack_interface {
         void view_lecture_materials();
         void view_assessments();
-        void grade_assessments();
-        void close_assessments();
         void view_comments();
         void add_comments();
         void logout();
-    }
-
-    interface student_interface {
-        void view_lecture_materials();
-        void view_assessments();
-        void submit_assessments();
-        void view_grades();
-        void view_comments();
-        void add_comments();
-        void logout();
-
     }
 
     public static void line() {
         System.out.println("----------------------------------------");
+    }
+
+    public static String date_time() {
+        SimpleDateFormat sd = new SimpleDateFormat(
+                "yyyy.MM.dd G 'at' HH:mm:ss z");
+        Date date = new Date();
+        sd.setTimeZone(TimeZone.getTimeZone("IST"));
+        return(sd.format(date));
     }
 
     public static void login_menu() {
@@ -57,8 +53,20 @@ public class A2 {
         while (!valid) {
             switch (choice) {
                 case 1 -> {
-                    Instructor();
+                    for (int i = 0; i < instructors.size(); i++) {
+                        System.out.println(i + " - " + instructors.get(i).instructor_id);
+                    }
+                    System.out.print("Enter your choice: ");
+                    int choice2 = scInt.nextInt();
+                    boolean valid2 = (choice2 >= 0 && choice2 < instructors.size());
+                    while (!valid2) {
+                        System.out.println("Invalid input. Please enter an input from the given options.");
+                        System.out.print("Enter your choice: ");
+                        choice2 = scInt.nextInt();
+                        valid2 = (choice2 >= 0 && choice2 < instructors.size());
+                    }
                     valid = true;
+                    Instructor(choice2);
                 }
                 case 2 -> {
                     Student();
@@ -67,6 +75,11 @@ public class A2 {
                 case 3 -> {
                     valid = true;
                     System.exit(0);
+                }
+                default -> {
+                    System.out.println("Invalid input. Please enter an input from the given options");
+                    System.out.print("Enter your choice: ");
+                    choice = scInt.nextInt();
                 }
             }
         }
@@ -100,20 +113,69 @@ public class A2 {
         line();
     }
 
-    public static class lectures {
-        String slide_topic;
-        String video;
-
+    public static class slide {
+        String instructor_id, slide_topic, date;
+        ArrayList<String> content = new ArrayList<>();
     }
-    public static class instructor extends lectures implements instructor_interface {
+
+    public static class video {
+        String instructor_id, video_topic, video_file, date;
+    }
+
+    public static class instructor implements backpack_interface {
         String instructor_id;
 
-        @Override
         public void add_lecture_material() {
-
+            System.out.println("""
+                    1. Add Lecture Slide
+                    2. Add Lecture Video""");
+            System.out.print("Enter your choice: ");
+            int choice = scInt.nextInt();
+            boolean valid = (choice >= 1 && choice <= 9);
+            while (!valid) {
+                System.out.println("Invalid input. Please enter an input from the given options");
+                System.out.print("Enter your choice: ");
+                choice = scInt.nextInt();
+                valid = (choice == 1 || choice == 2);
+            }
+            if (choice == 1) {
+                slide s = new slide();
+                System.out.print("Enter the topic of slides: ");
+                String slide_topic = scString.nextLine();
+                System.out.print("Enter the number of slides: ");
+                int n = scInt.nextInt();
+                if (n > 0) {
+                    s.instructor_id = instructor_id;
+                    s.slide_topic = slide_topic;
+                    for(int i = 0; i < n; i++) {
+                        System.out.print("Content for slide " + (i + 1) + ": ");
+                        String content = scString.nextLine();
+                        s.content.add(content);
+                    }
+                    s.date = date_time();
+                    slides.add(s);
+                }
+                else
+                    System.out.println("You chose not to add any lecture slides.");
+            }
+            else if (choice == 2) {
+                video v = new video();
+                System.out.print("Enter the topic of video: ");
+                v.video_topic = scString.nextLine();
+                System.out.print("Enter the filename of video: ");
+                scString.next();
+                String video_file = scString.next();
+                while (video_file.contains(" ") || !video_file.endsWith(".mp4")) {
+                    System.out.print("Incorrect file format. Please enter a single file name with '.mp4' extension.\nEnter the filename of video: ");
+                    video_file = scInt.nextLine();  // Fix this. Not taking input - check by entering 3 consecutive invalid inputs.
+                }
+                v.video_file = video_file;
+                videos.add(v);
+            }
+            else
+                System.out.println("Invalid input. Please enter an input from the given options");
         }
 
-        @Override
         public void add_assessments() {
 
         }
@@ -128,12 +190,10 @@ public class A2 {
 
         }
 
-        @Override
         public void grade_assessments() {
 
         }
 
-        @Override
         public void close_assessments() {
 
         }
@@ -153,7 +213,7 @@ public class A2 {
 
         }
     }
-    public static class student implements student_interface {
+    public static class student implements backpack_interface {
         String student_id;
 
         @Override
@@ -166,12 +226,10 @@ public class A2 {
 
         }
 
-        @Override
         public void submit_assessments() {
 
         }
 
-        @Override
         public void view_grades() {
 
         }
@@ -192,24 +250,12 @@ public class A2 {
         }
     }
 
-    public static void Instructor() {
-        for (int i = 0; i < instructors.size(); i++) {
-            System.out.println(i + " - " + instructors.get(i).instructor_id);
-        }
-        System.out.print("Enter your choice: ");
-        int choice = scInt.nextInt();
-        boolean valid = (choice >= 0 && choice < instructors.size());
-        while (!valid) {
-            System.out.println("Invalid input. Please enter an input from the given options.");
-            System.out.print("Enter your choice: ");
-            choice = scInt.nextInt();
-            valid = (choice >= 0 && choice < instructors.size());
-        }
+    public static void Instructor(int choice) {
         System.out.println("Welcome " + instructors.get(choice).instructor_id);
         instructor_menu();
         System.out.print("Enter your choice: ");
         choice = scInt.nextInt();
-        valid = (choice >= 1 && choice <= 9);
+        boolean valid = (choice >= 1 && choice <= 9);
         while (!valid) {
             System.out.println("Invalid input. Please enter an input from the given options");
             System.out.print("Enter your choice: ");
@@ -246,6 +292,7 @@ public class A2 {
                 login_menu();
             }
         }
+        Instructor(choice);
     }
 
     public static void Student() {
