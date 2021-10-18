@@ -5,9 +5,6 @@ AP Assignment 2
  2020149
 */
 
-import A1_2020149.A1;
-
-import java.lang.reflect.Array;
 import java.util.*;
 import java.text.*;
 
@@ -21,7 +18,9 @@ public class A2 {
     static ArrayList<video> videos = new ArrayList<>();  // Store all objects of video class
     static ArrayList<assignment> assignments = new ArrayList<>();  // Store all objects of assignment class
     static ArrayList<quiz> quizzes = new ArrayList<>();  // Store all objects of quiz class
+    static ArrayList<submission> submissions = new ArrayList<>();  // Store all objects of quiz class
 
+    static int id_count = 0;
 
     interface backpack_interface {
         void view_lecture_materials();
@@ -126,12 +125,18 @@ public class A2 {
     }
 
     public static class assignment {
-        String instructor_id, problem_statement;
-        int max_marks;
+        String instructor_id, problem_statement, date;
+        int assignment_id, max_marks, status = 0;  // By default, a status 0 represents assignment to be pending
     }
 
     public static class quiz {
-        String instructor_id, quiz_question, answer;
+        String instructor_id, quiz_question, answer, date;
+        int quiz_id, status = 0;  // By default, a status 0 represents quiz to be pending
+    }
+
+    public static class submission {
+        String student_id, instructor_id;
+        int assignment_id, quiz_id, status = 0;  // By default, a status 0 represents submission to be ungraded
     }
 
     public static class instructor implements backpack_interface {
@@ -205,26 +210,22 @@ public class A2 {
             }
             if (choice == 1) {
                 assignment a = new assignment();
+                a.assignment_id = ++id_count;
                 a.instructor_id = instructor_id;
                 System.out.print("Enter the problem statement: ");
                 a.problem_statement = scString.nextLine();
                 System.out.print("Enter max marks: ");
                 a.max_marks = scInt.nextInt();
+                a.date = date_time();
                 assignments.add(a);
             }
             else if (choice == 2) {
                 quiz q = new quiz();
+                q.quiz_id = ++id_count;
                 q.instructor_id = instructor_id;
                 System.out.print("Enter the quiz question: ");
                 q.quiz_question = scString.nextLine();
-                System.out.print("Enter the one-word answer: ");
-                String answer = scString.nextLine();
-                scInt.nextLine();
-                while (answer.contains(" ")) {
-                    System.out.print("Incorrect file format. Please enter a single word answer.\nEnter the one-word answer: ");
-                    answer = scInt.nextLine();
-                }
-                q.answer = answer;
+                q.date = date_time();
                 quizzes.add(q);
             }
             else
@@ -233,17 +234,93 @@ public class A2 {
 
         @Override
         public void view_lecture_materials() {
-            
-
+            if (slides.size() == 0 && videos.size() == 0) {
+                System.out.println("No lecture materials available.");
+                System.out.println();
+            }
+            else {
+                for (A2.slide slide : slides) {
+                    System.out.println("Title: " + slide.slide_topic);
+                    for (int i = 0; i < slide.content.size(); i++) {
+                        System.out.println("Slide " + (i + 1) + ": " + slide.content.get(i));
+                    }
+                    System.out.println("Number of slides: " + slide.content.size());
+                    System.out.println("Date of upload: " + slide.date);
+                    System.out.println("Uploaded by: " + slide.instructor_id);
+                    line();
+                }
+                System.out.println();
+                line();
+                for (A2.video video : videos) {
+                    System.out.println("Title of video: " + video.video_topic);
+                    System.out.println("Video file: " + video.video_file);
+                    System.out.println("Date of upload: " + video.date);
+                    System.out.println("Uploaded by: " + video.instructor_id);
+                }
+            }
         }
 
         @Override
         public void view_assessments() {
-
+            if (assignments.size() == 0 && quizzes.size() == 0) {
+                System.out.println("No assessments available.");
+                System.out.println();
+            }
+            else {
+                for (A2.assignment assignment : assignments) {
+                    System.out.println("Assignment: " + assignment.problem_statement);
+                    System.out.println("Max marks: " + assignment.max_marks);
+                    System.out.println("Date of upload: " + assignment.date);
+                    System.out.println("Uploaded by: " + assignment.instructor_id);
+                    line();
+                }
+                System.out.println();
+                line();
+                for (A2.quiz quiz : quizzes) {
+                    System.out.println("Question: " + quiz.quiz_question);
+                    System.out.println("Date of upload: " + quiz.date);
+                    System.out.println("Uploaded by: " + quiz.instructor_id);
+                    line();
+                }
+            }
         }
 
         public void grade_assessments() {
+            if (assignments.size() == 0 && quizzes.size() == 0) {
+                System.out.println("No assessments available.");
+                System.out.println();
+            }
+            else {
+                int i, j;
+                line();
+                for (i = 0; i < assignments.size(); i++) {
+                    System.out.println("ID: " + i);
+                    System.out.println("        Assignment: " + assignments.get(i).problem_statement);
+                    System.out.println("        Max marks: " + assignments.get(i).max_marks);
+                    line();
+                }
+                System.out.println();
+                line();
+                for (j = i; j < quizzes.size() + i; j++) {
+                    System.out.println("ID: " + j);
+                    System.out.println("        Question: " + quizzes.get(j - i).quiz_question);
+                    line();
+                }
+                System.out.print("Enter the ID of assessment to view submission: ");
+                int choice = scInt.nextInt();
+                if (choice >= assignments.size())
+                    choice = j - quizzes.size() - 1;
+                for (int k = 0; k < students.size(); k++) {
+                    for (int l = 0; l < submissions.size(); l++) {
+                        if (submissions.get(l).assignment_id == assignments.get(choice).assignment_id && submissions.get(l).status == 0 && submissions.get(l).student_id.equals(students.get(k).student_id)) {
+                            System.out.println(k + ". " + students.get(k).student_id);
+                            break;
+                        }
+                    }
+                }
+                System.out.print("Choose student ID from these ungraded submissions: ");
 
+            }
         }
 
         public void close_assessments() {
@@ -306,15 +383,15 @@ public class A2 {
         System.out.println("Welcome " + instructors.get(choice).instructor_id);
         instructor_menu();
         System.out.print("Enter your choice: ");
-        choice = scInt.nextInt();
-        boolean valid = (choice >= 1 && choice <= 9);
+        int choice2 = scInt.nextInt();
+        boolean valid = (choice2 >= 1 && choice2 <= 9);
         while (!valid) {
             System.out.println("Invalid input. Please enter an input from the given options");
             System.out.print("Enter your choice: ");
-            choice = scInt.nextInt();
-            valid = (choice >= 1 && choice <= 9);
+            choice2 = scInt.nextInt();
+            valid = (choice2 >= 1 && choice2 <= 9);
         }
-        switch  (choice) {
+        switch  (choice2) {
             case 1 -> {
                 instructors.get(choice).add_lecture_material();
             }
