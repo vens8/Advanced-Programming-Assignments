@@ -12,12 +12,15 @@ import java.util.*;
 import java.text.*;
 
 public class A2 {
-    static Scanner scInt = new Scanner(System.in);
-    static Scanner scString = new Scanner(System.in);
+    static Scanner scInt = new Scanner(System.in);  // Scanner to take integer inputs
+    static Scanner scString = new Scanner(System.in);  // Scanner to take String inputs
+
     static ArrayList<instructor> instructors = new ArrayList<>();  // Store all objects of instructor class
     static ArrayList<student> students = new ArrayList<>();  // Store all objects of student class
     static ArrayList<slide> slides = new ArrayList<>();  // Store all objects of slide class
     static ArrayList<video> videos = new ArrayList<>();  // Store all objects of video class
+    static ArrayList<assignment> assignments = new ArrayList<>();  // Store all objects of assignment class
+    static ArrayList<quiz> quizzes = new ArrayList<>();  // Store all objects of quiz class
 
 
     interface backpack_interface {
@@ -122,6 +125,15 @@ public class A2 {
         String instructor_id, video_topic, video_file, date;
     }
 
+    public static class assignment {
+        String instructor_id, problem_statement;
+        int max_marks;
+    }
+
+    public static class quiz {
+        String instructor_id, quiz_question, answer;
+    }
+
     public static class instructor implements backpack_interface {
         String instructor_id;
 
@@ -139,7 +151,7 @@ public class A2 {
                 valid = (choice == 1 || choice == 2);
             }
             if (choice == 1) {
-                slide s = new slide();
+                slide s = new slide();  // Uses-A a relationship
                 System.out.print("Enter the topic of slides: ");
                 String slide_topic = scString.nextLine();
                 System.out.print("Enter the number of slides: ");
@@ -159,16 +171,18 @@ public class A2 {
                     System.out.println("You chose not to add any lecture slides.");
             }
             else if (choice == 2) {
-                video v = new video();
+                video v = new video();  // Uses-A a relationship
+                v.instructor_id = instructor_id;
                 System.out.print("Enter the topic of video: ");
                 v.video_topic = scString.nextLine();
                 System.out.print("Enter the filename of video: ");
-                scString.next();
-                String video_file = scString.next();
+                String video_file = scString.nextLine();
+                scInt.nextLine();
                 while (video_file.contains(" ") || !video_file.endsWith(".mp4")) {
                     System.out.print("Incorrect file format. Please enter a single file name with '.mp4' extension.\nEnter the filename of video: ");
-                    video_file = scInt.nextLine();  // Fix this. Not taking input - check by entering 3 consecutive invalid inputs.
+                    video_file = scInt.nextLine();
                 }
+                v.date = date_time();
                 v.video_file = video_file;
                 videos.add(v);
             }
@@ -177,11 +191,49 @@ public class A2 {
         }
 
         public void add_assessments() {
-
+            System.out.println("""
+                    1. Add Assignment
+                    2. Add Quiz""");
+            System.out.print("Enter your choice: ");
+            int choice = scInt.nextInt();
+            boolean valid = (choice >= 1 && choice <= 9);
+            while (!valid) {
+                System.out.println("Invalid input. Please enter an input from the given options");
+                System.out.print("Enter your choice: ");
+                choice = scInt.nextInt();
+                valid = (choice == 1 || choice == 2);
+            }
+            if (choice == 1) {
+                assignment a = new assignment();
+                a.instructor_id = instructor_id;
+                System.out.print("Enter the problem statement: ");
+                a.problem_statement = scString.nextLine();
+                System.out.print("Enter max marks: ");
+                a.max_marks = scInt.nextInt();
+                assignments.add(a);
+            }
+            else if (choice == 2) {
+                quiz q = new quiz();
+                q.instructor_id = instructor_id;
+                System.out.print("Enter the quiz question: ");
+                q.quiz_question = scString.nextLine();
+                System.out.print("Enter the one-word answer: ");
+                String answer = scString.nextLine();
+                scInt.nextLine();
+                while (answer.contains(" ")) {
+                    System.out.print("Incorrect file format. Please enter a single word answer.\nEnter the one-word answer: ");
+                    answer = scInt.nextLine();
+                }
+                q.answer = answer;
+                quizzes.add(q);
+            }
+            else
+                System.out.println("Invalid input. Please enter an input from the given options");
         }
 
         @Override
         public void view_lecture_materials() {
+            
 
         }
 
