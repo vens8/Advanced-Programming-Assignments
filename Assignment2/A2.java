@@ -27,7 +27,6 @@ public class A2 {
         void view_assessments();
         void view_comments();
         void add_comments();
-        void logout();
     }
 
     public static void line() {
@@ -71,8 +70,20 @@ public class A2 {
                     Instructor(choice2);
                 }
                 case 2 -> {
-                    Student();
+                    for (int i = 0; i < students.size(); i++) {
+                        System.out.println(i + " - " + students.get(i).student_id);
+                    }
+                    System.out.print("Enter your choice: ");
+                    int choice2 = scInt.nextInt();
+                    boolean valid2 = (choice2 >= 0 && choice2 < students.size());
+                    while (!valid2) {
+                        System.out.println("Invalid input. Please enter an input from the given options.");
+                        System.out.print("Enter your choice: ");
+                        choice2 = scInt.nextInt();
+                        valid2 = (choice2 >= 0 && choice2 < students.size());
+                    }
                     valid = true;
+                    Student(choice2);
                 }
                 case 3 -> {
                     valid = true;
@@ -135,7 +146,7 @@ public class A2 {
     }
 
     public static class submission {
-        String student_id, instructor_id;
+        String student_id, instructor_id, assignment_filename, quiz_answer;
         int assignment_id, quiz_id, status = 0;  // By default, a status 0 represents submission to be ungraded
     }
 
@@ -239,6 +250,7 @@ public class A2 {
                 System.out.println();
             }
             else {
+                line();
                 for (A2.slide slide : slides) {
                     System.out.println("Title: " + slide.slide_topic);
                     for (int i = 0; i < slide.content.size(); i++) {
@@ -312,14 +324,14 @@ public class A2 {
                     choice = j - quizzes.size() - 1;
                 for (int k = 0; k < students.size(); k++) {
                     for (int l = 0; l < submissions.size(); l++) {
-                        if (submissions.get(l).assignment_id == assignments.get(choice).assignment_id && submissions.get(l).status == 0 && submissions.get(l).student_id.equals(students.get(k).student_id)) {
+                        if ((submissions.get(l).assignment_id == assignments.get(choice).assignment_id || submissions.get(l).quiz_id == quizzes.get(choice).quiz_id) && submissions.get(l).status == 0 && submissions.get(l).student_id.equals(students.get(k).student_id)) {
                             System.out.println(k + ". " + students.get(k).student_id);
                             break;
                         }
                     }
                 }
                 System.out.print("Choose student ID from these ungraded submissions: ");
-
+                int choice2 = scInt.nextInt();  // Do after submit assessments of student
             }
         }
 
@@ -337,26 +349,122 @@ public class A2 {
 
         }
 
-        @Override
-        public void logout() {
-
-        }
     }
     public static class student implements backpack_interface {
         String student_id;
 
         @Override
         public void view_lecture_materials() {
-
+            if (slides.size() == 0 && videos.size() == 0) {
+                System.out.println("No lecture materials available.");
+                System.out.println();
+            }
+            else {
+                for (A2.slide slide : slides) {
+                    System.out.println("Title: " + slide.slide_topic);
+                    for (int i = 0; i < slide.content.size(); i++) {
+                        System.out.println("Slide " + (i + 1) + ": " + slide.content.get(i));
+                    }
+                    System.out.println("Number of slides: " + slide.content.size());
+                    System.out.println("Date of upload: " + slide.date);
+                    System.out.println("Uploaded by: " + slide.instructor_id);
+                    line();
+                }
+                System.out.println();
+                line();
+                for (A2.video video : videos) {
+                    System.out.println("Title of video: " + video.video_topic);
+                    System.out.println("Video file: " + video.video_file);
+                    System.out.println("Date of upload: " + video.date);
+                    System.out.println("Uploaded by: " + video.instructor_id);
+                }
+            }
         }
 
         @Override
         public void view_assessments() {
-
+            if (assignments.size() == 0 && quizzes.size() == 0) {
+                System.out.println("No assessments available.");
+                System.out.println();
+            }
+            else {
+                for (A2.assignment assignment : assignments) {
+                    System.out.println("Assignment: " + assignment.problem_statement);
+                    System.out.println("Max marks: " + assignment.max_marks);
+                    System.out.println("Date of upload: " + assignment.date);
+                    System.out.println("Uploaded by: " + assignment.instructor_id);
+                    line();
+                }
+                System.out.println();
+                line();
+                for (A2.quiz quiz : quizzes) {
+                    System.out.println("Question: " + quiz.quiz_question);
+                    System.out.println("Date of upload: " + quiz.date);
+                    System.out.println("Uploaded by: " + quiz.instructor_id);
+                    line();
+                }
+            }
         }
 
         public void submit_assessments() {
+            if (assignments.size() == 0 && quizzes.size() == 0) {
+                System.out.println("No assessments available.");
+                System.out.println();
+            }
+            else {
+                int i, j;
+                line();
+                for (i = 0; i < assignments.size(); i++) {
+                    System.out.println("ID: " + i);
+                    System.out.println("        Assignment: " + assignments.get(i).problem_statement);
+                    System.out.println("        Max marks: " + assignments.get(i).max_marks);
+                    line();
+                }
+                System.out.println();
+                line();
+                for (j = i; j < quizzes.size() + i; j++) {
+                    System.out.println("ID: " + j);
+                    System.out.println("        Question: " + quizzes.get(j - i).quiz_question);
+                    line();
+                }
+                System.out.print("Enter the ID of assessment: ");
+                int choice = scInt.nextInt();
+                if (choice >= assignments.size()) {
+                    choice = j - quizzes.size() - 1;
+                    submission s = new submission();
+                    s.student_id = student_id;
+                    System.out.print(quizzes.get(choice).quiz_question + " ");
+                    System.out.print("Enter a one-word answer: ");
+                    String quiz_answer = scString.nextLine();
+                    scInt.nextLine();
+                    while (quiz_answer.contains(" ")) {
+                        System.out.print("Invalid answer.\nEnter a one-word answer: ");
+                        quiz_answer = scInt.nextLine();
+                    }
+                    s.quiz_id = quizzes.get(choice).quiz_id;
+                    s.quiz_answer = quiz_answer;
+                    s.status = 1;  // Submission status 1 represents submitted
+                    s.assignment_id = 0;  // Assignment ID is 0 when submission is an quiz
+                    s.assignment_filename = null;  // Assignment filename is null when submission is an quiz
 
+                }
+                else {
+                    submission s = new submission();
+                    s.student_id = student_id;
+                    System.out.print("Enter the filename of the assignment: ");
+                    String filename = scString.nextLine();
+                    scInt.nextLine();
+                    while (filename.contains(" ") || !filename.endsWith(".zip")) {
+                        System.out.print("Incorrect file format. Please enter a single file name with '.zip' extension.\nEnter the filename of the assignment: ");
+                        filename = scInt.nextLine();
+                    }
+                    s.assignment_id = assignments.get(choice).assignment_id;
+                    s.assignment_filename = filename;
+                    s.status = 1;  // Submission status 1 represents submitted
+                    s.quiz_id = 0;  // Quiz ID is 0 when submission is an assignment
+                    s.quiz_answer = null;  // Quiz answer is null when submission is an assignment
+                }
+            }
         }
 
         public void view_grades() {
@@ -370,11 +478,6 @@ public class A2 {
 
         @Override
         public void add_comments() {
-
-        }
-
-        @Override
-        public void logout() {
 
         }
     }
@@ -424,10 +527,43 @@ public class A2 {
         Instructor(choice);
     }
 
-    public static void Student() {
-        for (int i = 0; i < students.size(); i++) {
-            System.out.print(i + " - " + students.get(i).student_id);
+    public static void Student(int choice) {
+        System.out.println("Welcome " + students.get(choice).student_id);
+        student_menu();
+        System.out.print("Enter your choice: ");
+        int choice2 = scInt.nextInt();
+        boolean valid = (choice2 >= 1 && choice2 <= 7);
+        while (!valid) {
+            System.out.println("Invalid input. Please enter an input from the given options");
+            System.out.print("Enter your choice: ");
+            choice2 = scInt.nextInt();
+            valid = (choice2 >= 1 && choice2 <= 7);
         }
+        switch  (choice2) {
+            case 1 -> {
+                students.get(choice).view_lecture_materials();
+            }
+            case 2 -> {
+                students.get(choice).view_assessments();
+            }
+            case 3 -> {
+                students.get(choice).submit_assessments();
+            }
+            case 4 -> {
+                students.get(choice).view_grades();
+            }
+            case 5 -> {
+                students.get(choice).view_comments();
+            }
+            case 6 -> {
+                students.get(choice).add_comments();
+            }
+            case 7 -> {
+                System.out.println("Welcome to Backpack!");
+                login_menu();
+            }
+        }
+        Instructor(choice);
     }
     public static void main (String[] args) {
         instructor I0 = new instructor();
