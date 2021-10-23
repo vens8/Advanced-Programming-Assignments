@@ -5,10 +5,9 @@ AP Assignment 3
  2020149
 */
 
-import java.sql.Array;
 import java.util.*;
 
-class Dice {
+class Dice {  // Encapsulated Dice class
     private final int faces;
     private int value;
     public Dice(int faces) {
@@ -23,7 +22,7 @@ class Dice {
     }
 }
 
-class Floor {
+class Floor {  // Encapsulated Empty Floor class
     private final int points;
     private int position;
     private final String name = "an Empty Floor";
@@ -48,7 +47,7 @@ class Floor {
     }
 }
 
-class Ladder extends Floor {
+class Ladder extends Floor {  // Encapsulated & inherited Ladder class
     private final int points;
     private int position;
     private final String name = "a Ladder Floor";
@@ -77,7 +76,7 @@ class Ladder extends Floor {
     }
 }
 
-class Elevator extends Floor {
+class Elevator extends Floor {  // Encapsulated & inherited Elevator class
     private final int points;
     private int position;
     private final String name = "an Elevator Floor";
@@ -106,7 +105,7 @@ class Elevator extends Floor {
     }
 }
 
-class Snake {  // Normal Snake
+class Snake {  // Encapsulated Normal Snake class
     private final int points;
     private int position;
     private final String name = "a Snake Floor";
@@ -132,7 +131,7 @@ class Snake {  // Normal Snake
     }
 }
 
-class kingCobra extends Snake {  // Kind Cobra snake
+class kingCobra extends Snake {  // Encapsulated & inherited King Cobra class
     private final int points;
     private int position;
     private final String name = "a King Cobra Floor";
@@ -162,13 +161,13 @@ class kingCobra extends Snake {  // Kind Cobra snake
     }
 }
 
-class Player {
+class Player {  // Encapsulated player class
     private String name;
     private int position;
     private int points;
 
     public Player() {
-        this.position = -1;
+        this.position = -1;  // Initial position of player object before entering the board
         this.points = 0;
     }
 
@@ -211,7 +210,7 @@ class Board {
 
     public Board() {
         // Create board items
-        size = 14;
+        size = 14;  // Initial size of the board by default
 
         Floor f0 = new Floor();
         f0.setPosition(0);
@@ -301,7 +300,7 @@ class Board {
             d.roll();
             System.out.println("Dice gave " + d.getValue());
         }
-        if (p.getPosition() + d.getValue() <= 13) {
+        if (p.getPosition() + d.getValue() <= 13) {  // If the player can make a valid move
             p.setPosition(p.getPosition() + d.getValue());
             updatePoints(p.getPosition());
         }
@@ -310,7 +309,7 @@ class Board {
         }
     }
 
-    public static void updatePoints(int position) {
+    public static void updatePoints(int position) {  // Update the points with every dice roll
         System.out.println("Player position Floor - " + position);
         if (empty.get(position) != null) {
             System.out.println(p.getName() + " has reached " + empty.get(position).getName());
@@ -332,13 +331,13 @@ class Board {
             System.out.println(p.getName() + " has reached " + kingCobras.get(position).getName());
             p.setPoints(p.getPoints() + kingCobras.get(position).getPoints());  // Update player points
         }
-        System.out.println("Total points: " + p.getPoints());  // Common to all, put at the end of for loop
+        System.out.println("Total points: " + p.getPoints());
     }
 }
 
 public class A3 {
 
     public static void main (String[] args) {
-        Board board = new Board();
+        Board board = new Board();  // Creating a board object
     }
 }
