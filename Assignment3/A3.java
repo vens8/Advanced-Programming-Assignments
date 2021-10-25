@@ -22,42 +22,89 @@ class Dice {  // Encapsulated Dice class
     }
 }
 
-class Floor {  // Encapsulated Empty Floor class
-    private final int points;
+abstract class Floor {  // Encapsulated Empty Floor class
+    public abstract int getPoints();
+
+    public abstract void setPoints(int points);
+
+    public abstract int getPosition();
+
+    public abstract void setPosition(int position);
+
+    public abstract String getName();
+
+    public abstract void setName(String name);
+
+    public abstract int getJump();
+}
+
+class Empty extends Floor {  // Encapsulated & inherited Ladder class
+    private int points;
     private int position;
-    private final String name = "an Empty Floor";
-    public Floor() {
+    private String name;
+    private int jump;  // Specify which position to jump to on the board
+    public Empty() {
         this.points = 1;
+        this.name = "an Empty Floor";
+        this.jump = 0;
     }
 
+    @Override
     public int getPoints() {
         return points;
     }
 
+    @Override
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    @Override
     public int getPosition() {
         return position;
     }
 
+    @Override
     public void setPosition(int position) {
         this.position = position;
     }
 
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int getJump() {
+        return jump;
     }
 }
 
 class Ladder extends Floor {  // Encapsulated & inherited Ladder class
-    private final int points;
+    private int points;
     private int position;
-    private final String name = "a Ladder Floor";
+    private String name;
+    private int jump;  // Specify which position to jump to on the board
+
     public Ladder() {
         this.points = 2;
+        this.name = "a Ladder Floor";
+        this.jump = 4;
     }
 
     @Override
     public int getPoints() {
         return points;
+    }
+
+    @Override
+    public void setPoints(int points) {
+        this.points = points;
     }
 
     @Override
@@ -73,20 +120,39 @@ class Ladder extends Floor {  // Encapsulated & inherited Ladder class
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int getJump() {
+        return jump;
     }
 }
 
 class Elevator extends Floor {  // Encapsulated & inherited Elevator class
-    private final int points;
+    private int points;
     private int position;
-    private final String name = "an Elevator Floor";
+    private String name;
+    private int jump;  // Specify which position to jump to on the board
+
     public Elevator() {
         this.points = 4;
+        this.name = "an Elevator Floor";
+        this.jump = 8;
     }
 
     @Override
     public int getPoints() {
         return points;
+    }
+
+    @Override
+    public void setPoints(int points) {
+        this.points = points;
     }
 
     @Override
@@ -103,61 +169,110 @@ class Elevator extends Floor {  // Encapsulated & inherited Elevator class
     public String getName() {
         return name;
     }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+    @Override
+    public int getJump(){
+        return jump;
+    }
 }
 
-class Snake {  // Encapsulated Normal Snake class
-    private final int points;
+class Snake extends Floor{  // Encapsulated & inherited Snake class
+    private int points;
     private int position;
-    private final String name = "a Snake Floor";
+    private String name;
+    private int jump;  // Specify which position to jump to on the board
 
     public Snake() {
-        points = -2;
+        this.points = -2;
+        this.name = "a Snake Floor";
+        this.jump = -4;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
+    @Override
     public int getPoints() {
         return points;
     }
 
-    public String getName() {
-        return name;
-    }
-}
-
-class kingCobra extends Snake {  // Encapsulated & inherited King Cobra class
-    private final int points;
-    private int position;
-    private final String name = "a King Cobra Floor";
-
-    public kingCobra() {
-        points = -4;
+    @Override
+    public void setPoints(int points) {
+        this.points = points;
     }
 
     @Override
-    public void setPosition(int position) {  // Polymorphism
-        this.position = position;
-    }
-
-    @Override
-    public int getPoints() {  // Polymorphism
-        return points;
-    }
-
-    @Override
-    public int getPosition() {  // Polymorphism
+    public int getPosition() {
         return position;
     }
 
     @Override
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int getJump(){
+        return jump;
+    }
+}
+
+class kingCobra extends Floor {  // Encapsulated & inherited King Cobra class
+    private int points;
+    private int position;
+    private String name;
+    private int jump;  // Specify which position to jump to on the board
+
+    public kingCobra() {
+        this.points = -4;
+        this.name = "a King Cobra Floor";
+        this.jump = -8;
+    }
+
+    @Override
+    public int getPoints() {
+        return points;
+    }
+
+    @Override
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    @Override
+    public int getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int getJump(){
+        return jump;
     }
 }
 
@@ -202,71 +317,67 @@ class Board {
     private final static Player p = new Player();
     static Scanner sc = new Scanner(System.in);
 
-    static HashMap<Integer, Snake> snakes = new HashMap<>();  // Store all objects of Snake class in respective positions
-    static HashMap<Integer, kingCobra> kingCobras = new HashMap<>();  // Store all objects of kingCobra class in respective positions
-    static HashMap<Integer, Floor> empty = new HashMap<>();  // Store all objects of Floor class in respective positions
-    static HashMap<Integer, Ladder> ladders = new HashMap<>();  // Store all objects of Ladder class in respective positions
-    static HashMap<Integer, Elevator> elevators = new HashMap<>(14);  // Store all objects of Elevator class in respective positions
+    static HashMap<Integer, Floor> floors = new HashMap<>();  // Store all objects of Floor class children in respective positions
 
-    public Board() {
+    public Board(int size) {
         // Create board items
-        size = 14;  // Initial size of the board by default
+        this.size = size;  // Initial size of the board by default
 
-        Floor f0 = new Floor();
+        Empty f0 = new Empty();
         f0.setPosition(0);
-        empty.put(0, f0);
+        floors.put(0, f0);
 
-        Floor f1 = new Floor();
+        Empty f1 = new Empty();
         f1.setPosition(1);
-        empty.put(1, f1);
+        floors.put(1, f1);
 
         Elevator e2 = new Elevator();
         e2.setPosition(2);
-        elevators.put(2, e2);
+        floors.put(2, e2);
 
-        Floor f3 = new Floor();
+        Empty f3 = new Empty();
         f3.setPosition(3);
-        empty.put(3, f3);
+        floors.put(3, f3);
 
-        Floor f4 = new Floor();
+        Empty f4 = new Empty();
         f4.setPosition(4);
-        empty.put(4, f4);
+        floors.put(4, f4);
 
         Snake s5 = new Snake();
         s5.setPosition(5);
-        snakes.put(5, s5);
+        floors.put(5, s5);
 
-        Floor f6 = new Floor();
+        Empty f6 = new Empty();
         f6.setPosition(6);
-        empty.put(6, f6);
+        floors.put(6, f6);
 
-        Floor f7 = new Floor();
+        Empty f7 = new Empty();
         f7.setPosition(7);
-        empty.put(7, f7);
+        floors.put(7, f7);
 
         Ladder l8 = new Ladder();
         l8.setPosition(8);
-        ladders.put(8, l8);
+        floors.put(8, l8);
 
-        Floor f9 = new Floor();
+        Empty f9 = new Empty();
         f9.setPosition(9);
-        empty.put(9, f9);
+        floors.put(9, f9);
 
-        Floor f10 = new Floor();
+        Empty f10 = new Empty();
         f10.setPosition(10);
-        empty.put(10, f10);
+        floors.put(10, f10);
 
         kingCobra k11 = new kingCobra();
         k11.setPosition(11);
-        kingCobras.put(11, k11);
+        floors.put(11, k11);
 
-        Floor f12 = new Floor();
+        Empty f12 = new Empty();
         f12.setPosition(12);
-        empty.put(12, f12);
+        floors.put(12, f12);
 
-        Floor f13 = new Floor();
+        Empty f13 = new Empty();
         f13.setPosition(13);
-        empty.put(13, f13);
+        floors.put(13, f13);
 
         System.out.println("Enter the player name and hit enter");
         String name = sc.nextLine();
@@ -303,6 +414,11 @@ class Board {
         if (p.getPosition() + d.getValue() <= 13) {  // If the player can make a valid move
             p.setPosition(p.getPosition() + d.getValue());
             updatePoints(p.getPosition());
+            System.out.println(p.getPosition());
+            System.out.println(!floors.get(p.getPosition()).getName().equals("an Empty Floor"));
+            if (!floors.get(p.getPosition()).getName().equals("an Empty Floor")) {
+                updatePoints(p.getPosition());
+            }
         }
         else {
             System.out.println("Player cannot move.");
@@ -311,33 +427,16 @@ class Board {
 
     public static void updatePoints(int position) {  // Update the points with every dice roll
         System.out.println("Player position Floor - " + position);
-        if (empty.get(position) != null) {
-            System.out.println(p.getName() + " has reached " + empty.get(position).getName());
-            p.setPoints(p.getPoints() + empty.get(position).getPoints());  // Update player points
-        }
-        else if (ladders.get(position) != null) {
-            System.out.println(p.getName() + " has reached " + ladders.get(position).getName());
-            p.setPoints(p.getPoints() + ladders.get(position).getPoints());  // Update player points
-        }
-        else if (elevators.get(position) != null) {
-            System.out.println(p.getName() + " has reached " + elevators.get(position).getName());
-            p.setPoints(p.getPoints() + elevators.get(position).getPoints());  // Update player points
-        }
-        else if (snakes.get(position) != null) {
-            System.out.println(p.getName() + " has reached " + snakes.get(position).getName());
-            p.setPoints(p.getPoints() + snakes.get(position).getPoints());  // Update player points
-        }
-        else if (kingCobras.get(position) != null) {
-            System.out.println(p.getName() + " has reached " + kingCobras.get(position).getName());
-            p.setPoints(p.getPoints() + kingCobras.get(position).getPoints());  // Update player points
-        }
+        System.out.println(p.getName() + " has reached " + floors.get(position).getName());
+        p.setPoints(p.getPoints() + floors.get(position).getPoints());  // Update player points
         System.out.println("Total points: " + p.getPoints());
+        p.setPosition(p.getPosition() + floors.get(p.getPosition()).getJump());
     }
 }
 
 public class A3 {
 
     public static void main (String[] args) {
-        Board board = new Board();  // Creating a board object
+        Board board = new Board(14);  // Creating a board object
     }
 }
