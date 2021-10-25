@@ -414,9 +414,8 @@ class Board {
         if (p.getPosition() + d.getValue() <= 13) {  // If the player can make a valid move
             p.setPosition(p.getPosition() + d.getValue());
             updatePoints(p.getPosition());
-            System.out.println(p.getPosition());
-            System.out.println(!floors.get(p.getPosition()).getName().equals("an Empty Floor"));
-            if (!floors.get(p.getPosition()).getName().equals("an Empty Floor")) {
+            if (!floors.get(p.getPosition()).getName().equalsIgnoreCase("an Empty Floor")) {
+                p.setPosition(p.getPosition() + floors.get(p.getPosition()).getJump());
                 updatePoints(p.getPosition());
             }
         }
@@ -430,7 +429,6 @@ class Board {
         System.out.println(p.getName() + " has reached " + floors.get(position).getName());
         p.setPoints(p.getPoints() + floors.get(position).getPoints());  // Update player points
         System.out.println("Total points: " + p.getPoints());
-        p.setPosition(p.getPosition() + floors.get(p.getPosition()).getJump());
     }
 }
 
