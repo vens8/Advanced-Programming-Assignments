@@ -312,10 +312,11 @@ class Player {  // Encapsulated player class
 }
 
 class Board {
-    private static int size;
+    private int size;
     private final static Dice d = new Dice(2);
-    private final static Player p = new Player();
+    private static ArrayList<Player> players = new ArrayList<>();
     static Scanner sc = new Scanner(System.in);
+    private static int total_players;
 
     static HashMap<Integer, Floor> floors = new HashMap<>();  // Store all objects of Floor class children in respective positions
 
@@ -378,57 +379,137 @@ class Board {
         Empty f13 = new Empty();
         f13.setPosition(13);
         floors.put(13, f13);
-
-        System.out.println("Enter the player name and hit enter");
-        String name = sc.nextLine();
-        p.setName(name);
+        
+        // Added extra functionality for bonus (Single player & Multiplayer)
+        System.out.print("Enter the number of players (1-4): ");
+        total_players = sc.nextInt();
+        while (total_players < 1 || total_players > 4) {
+            System.out.println("Please select a number in the range 1-4.");
+            System.out.print("Enter the number of players (1-4): ");
+            total_players = sc.nextInt();
+        }
+        for (int i = 0; i < total_players; i++) {
+            Scanner scInt = new Scanner(System.in);
+            System.out.println("Enter the name of player " + (i + 1) + " and hit enter");
+            Player p = new Player();
+            String name = scInt.nextLine();
+            p.setName(name);
+            players.add(p);
+        }
+        sc.nextLine();
         System.out.println("The game setup is ready");
-
-        while (p.getPosition() != 13) {
-            play();
+        System.out.println();
+        boolean game_over = false;
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).getPosition() >= 13) {
+                game_over = true;
+                break;
+            }
         }
-        System.out.println("Game Over");
-        System.out.println(p.getName() + " accumulated " + p.getPoints() + " points.");
+        while (!game_over) {
+            for (int j = 0; j < total_players; j++) {
+                if (total_players > 1)
+                    System.out.println("--> It's " + players.get(j).getName() + "'s turn <--");
+                play(j);
+                System.out.println();
+                if (players.get(j).getPosition() == 13) {
+                    game_over = true;
+                    System.out.println("+-----------+");
+                    System.out.println("| Game Over |");
+                    System.out.println("+-----------+");
+                    if (total_players > 1)
+                        System.out.println(players.get(j).getName() + " has won!");
+                    System.out.println(players.get(j).getName() + " accumulated " + players.get(j).getPoints() + " points.");
+                    if (total_players > 1) {
+                        print_leaderboard();
+                    }
+                    System.exit(0);
+                }
+            }
+        }
     }
 
-    public static void play() {
-        if (p.getPosition() == -1) {  // Before the player makes it to the board
+    public static void play(int index) {
+        boolean play = false;
+        if (players.get(index).getPosition() == -1) {  // Before the player makes it to the board
             System.out.print("Hit enter to roll the dice");
             sc.nextLine();
             d.roll();
             System.out.println("Dice gave " + d.getValue());
-            while (d.getValue() != 1) {
+            if (d.getValue() != 1) {
                 System.out.println("Game cannot start until you get 1");
-                System.out.print("Hit enter to roll the dice");
-                sc.nextLine();
-                d.roll();
-                System.out.println("Dice gave " + d.getValue());
+                if (total_players == 1) {
+                    while (d.getValue() != 1) {
+                        System.out.print("Hit enter to roll the dice");
+                        sc.nextLine();
+                        d.roll();
+                        System.out.println("Dice gave " + d.getValue());
+                    }
+                    play = true;
+                }
             }
+            else
+                play = true;
         }
         else {
             System.out.print("Hit enter to roll the dice");
             sc.nextLine();
             d.roll();
             System.out.println("Dice gave " + d.getValue());
+            play = true;
         }
-        if (p.getPosition() + d.getValue() <= 13) {  // If the player can make a valid move
-            p.setPosition(p.getPosition() + d.getValue());
-            updatePoints(p.getPosition());
-            if (!floors.get(p.getPosition()).getName().equalsIgnoreCase("an Empty Floor")) {
-                p.setPosition(p.getPosition() + floors.get(p.getPosition()).getJump());
-                updatePoints(p.getPosition());
+        if (play) {
+            if (players.get(index).getPosition() + d.getValue() <= 13) {  // If the player can make a valid move
+                players.get(index).setPosition(players.get(index).getPosition() + d.getValue());
+                updatePoints(index, players.get(index).getPosition());
+                if (!floors.get(players.get(index).getPosition()).getName().equalsIgnoreCase("an Empty Floor")) {
+                    players.get(index).setPosition(players.get(index).getPosition() + floors.get(players.get(index).getPosition()).getJump());
+                    updatePoints(index, players.get(index).getPosition());
+                }
+            } else {
+                System.out.println("Player cannot move.");
             }
-        }
-        else {
-            System.out.println("Player cannot move.");
         }
     }
 
-    public static void updatePoints(int position) {  // Update the points with every dice roll
+    public static void updatePoints(int index, int position) {  // Update the points with every dice roll
         System.out.println("Player position Floor - " + position);
-        System.out.println(p.getName() + " has reached " + floors.get(position).getName());
-        p.setPoints(p.getPoints() + floors.get(position).getPoints());  // Update player points
-        System.out.println("Total points: " + p.getPoints());
+        System.out.println(players.get(index).getName() + " has reached " + floors.get(position).getName());
+        players.get(index).setPoints(players.get(index).getPoints() + floors.get(position).getPoints());  // Update player points
+        System.out.println("Total points: " + players.get(index).getPoints());
+    }
+
+    public static void print_leaderboard() {
+        int count = 0, index = -1;
+        String player_name = null;
+        ArrayList<Player> temp_players = new ArrayList<>();
+        temp_players = players;
+        System.out.println();
+        System.out.println("                     LEADERBOARD                     ");
+        System.out.println("+----------------------------------------------------+");
+        System.out.println("|       Player Name       |       Player Score       |");
+        System.out.println("+----------------------------------------------------+");
+        while (temp_players.size() > 0) {
+            int i, max = -100;
+            for (i = 0; i < temp_players.size(); i++) {
+                if (temp_players.get(i).getPoints() > max) {
+                    max = temp_players.get(i).getPoints();
+                    player_name = temp_players.get(i).getName();
+                    index = i;
+                }
+            }
+            ++count;
+            System.out.print("|" + count + ". " + player_name);
+            for (int j = 0; j < 22 - player_name.length(); j++)
+                System.out.print(" ");
+            String max_string = Integer.toString(max);
+            System.out.print("|            " + max_string);
+            for (int j = 0; j < 14 - max_string.length(); j++)
+                System.out.print(" ");
+            System.out.println("|");
+            System.out.println("+----------------------------------------------------+");
+            temp_players.remove(index);
+        }
     }
 }
 
