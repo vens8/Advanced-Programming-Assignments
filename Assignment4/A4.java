@@ -5,7 +5,6 @@ AP Assignment 3
  2020149
 */
 
-// ADD EXCEPTION HANDLING
 import java.util.*;
 
 class Calculator<first, second> {
@@ -23,7 +22,7 @@ class Calculator<first, second> {
     }
 }
 
-class customException extends RuntimeException{
+class customException extends Exception {
     String message;
     customException(String message) {
         this.message=message;
@@ -50,7 +49,7 @@ class Dice {  // Encapsulated Dice class
 }
 
 class toy implements Cloneable {
-    private String name;
+    private final String name;
     public toy(String name) {
         this.name = name;
     }
@@ -61,13 +60,12 @@ class toy implements Cloneable {
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        toy t = (toy)super.clone();
-        return t;
+        return (toy)super.clone();
     }
 }
 
 class tile {
-    private toy t;
+    private final toy t;
     private static int tileNo;
     public tile (toy t) {
         this.t = t;
@@ -108,10 +106,10 @@ class Player {  // Encapsulated player class
 class Game {
     private static Player player;
     private int size;
-    private final static Dice d = new Dice(22);  // 1 - 21
+    private final static Dice d = new Dice(23);  // 1 - 22
     private final static ArrayList<tile> carpet = new ArrayList<>();
-    private final static String ordinal[] = {"first", "second", "third", "fourth", "fifth"};
-    static Scanner sc = new Scanner(System.in);
+    private final static String[] ordinal = {"first", "second", "third", "fourth", "fifth"};
+    private static final Scanner sc = new Scanner(System.in);
 
     public Game(int size) {
         // Create carpet tiles
@@ -135,13 +133,13 @@ class Game {
         carpet.add(new tile(new toy("Superman")));
         carpet.add(new tile(new toy("Mr. Bean")));
         carpet.add(new tile(new toy("Teddy Bear")));
+        carpet.add(new tile(new toy("Lightning McQueen")));
+        carpet.add(new tile(new toy("Andy")));
+        carpet.add(new tile(new toy("Buzz Lightyear")));
+        carpet.add(new tile(new toy("Mr. Potato")));
+        carpet.add(new tile(new toy("Panda")));
         carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
+        carpet.add(new tile(new toy("Rabbit")));
 
         System.out.println("Game is ready");
         boolean game_over = false;
@@ -154,11 +152,16 @@ class Game {
                 System.out.println("| Game Over |");
                 System.out.println("+-----------+");
                 System.out.println("Soft toys you won are:");
-                for (i = 0; i < player.getBucket().size() - 1; i++) {
-                    System.out.print(player.getBucket().get(i).getName() + ", ");
+                try {
+                    for (i = 0; i < Player.getBucket().size() - 1; i++) {
+                        System.out.print(Player.getBucket().get(i).getName() + ", ");
+                    }
+                    System.out.print(Player.getBucket().get(i).getName());
+                    System.out.println("\n");
                 }
-                System.out.print(player.getBucket().get(i).getName());
-                System.out.println("\n");
+                catch (IndexOutOfBoundsException e) {
+                    System.out.println(e);
+                }
             } else {
                 play();
             }
@@ -172,10 +175,10 @@ class Game {
         while (!right) {
             try {
                 input = sc.nextLine();
-                right = true;
                 if (input.equalsIgnoreCase("integer")) {
                     Dice d1 = new Dice(100000);
                     boolean b = false;
+                    right = true;
                     int result;
                     while (!b) {
                         try {
@@ -187,9 +190,9 @@ class Game {
                             // Input result
                             System.out.println("Calculate the result of " + first + " divided by " + second);
                             result = sc.nextInt();
+                            sc.nextLine();
                             b = true;
                             Calculator<Integer, Integer> calculator = new Calculator<>(first, second);
-                            System.out.println(calculator.getResult());
                             return ((Integer) calculator.getResult() == result);
                         } catch (InputMismatchException e) {
                             System.out.println(e);
@@ -198,6 +201,7 @@ class Game {
                     }
                 } else if (input.equalsIgnoreCase("string")) {
                     boolean b = false;
+                    right = true;
                     while (!b) {
                         try {
                             b = true;
@@ -221,25 +225,27 @@ class Game {
 
                             System.out.println("Calculate the concatenation of strings " + generated1 + " " + generated2);
                             String answer = sc.nextLine();
+                            //sc.nextLine();
                             Calculator<String, String> calculator = new Calculator<>(generated1, generated2);
-                            return (((String) calculator.getResult()).equals(answer));
+                            return (calculator.getResult().equals(answer));
                         } catch (InputMismatchException e) {
                             System.out.println(e);
                             sc.nextLine();
                         }
                     }
                 } else {
-                    System.out.println("Invalid option!");
+                    throw new customException("Invalid choice exception\n");
                 }
-            } catch (InputMismatchException e) {
-                System.out.println(e);
-                sc.nextLine();
+            } catch (customException e) {
+                System.out.print(e);
+                System.out.println("Question answer round. Please enter 'integer' or 'string' accordingly");
             }
         }
         return false;
     }
 
     public static void play() {
+
         System.out.print("Hit enter for your " + ordinal[(5 - player.getChances())] + " hop");
         sc.nextLine();
         d.roll();
@@ -251,10 +257,13 @@ class Game {
                 try {
                     toy t = (toy) carpet.get(d.getValue() - 1).getT().clone();
                     player.addToy(t);
-                    System.out.println("You won a " + t.getName() + " toy");
+                    System.out.println("You won a(n) " + t.getName() + " toy");
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                     sc.nextLine();
+                }
+                catch (IndexOutOfBoundsException e) {  // For line 260
+                    System.out.println(e);
                 }
             } else {  // Question on a odd tile.
                 if (solveQuestion()) {
@@ -267,8 +276,12 @@ class Game {
                         e.printStackTrace();
                         sc.nextLine();
                     }
+                    catch (IndexOutOfBoundsException e) {  // For line 260
+                        System.out.println(e);
+                    }
                 } else {
-                    System.out.println("Incorrect answer\nYou didn't win any soft toy.");
+                    System.out.println("Incorrect answer.");
+                    System.out.println("You didn't win any soft toy.");
                 }
             }
         }
