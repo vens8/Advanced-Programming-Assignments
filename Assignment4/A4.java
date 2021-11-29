@@ -4,12 +4,15 @@ AP Assignment 3
  Rahul Maddula
  2020149
 */
+
+// ADD EXCEPTION HANDLING
 import java.util.*;
 
 class Calculator<first, second> {
-    private first f, result;
-    private second s;
+    private first result;  // Could be second too since
+    int a = 10;
     public Calculator(first f, second s) {
+
         if ((f instanceof Integer) && (s instanceof Integer))
             result = (first) ((Integer)((Integer)f/(Integer)s));
         else if((f instanceof String) && (s instanceof String))
@@ -20,9 +23,9 @@ class Calculator<first, second> {
     }
 }
 
-class InvalidTyeException extends RuntimeException{
+class customException extends RuntimeException{
     String message;
-    InvalidTyeException(String message) {
+    customException(String message) {
         this.message=message;
     }
     public String toString()
@@ -77,21 +80,12 @@ class tile {
 }
 
 class Player {  // Encapsulated player class
-    private int position, chances;
+    private int chances;
     private static ArrayList<toy> bucket;
 
     public Player() {
-        this.position = 0;  // Initial position of player object before entering the board
         this.chances = 5;
         bucket = new ArrayList<>();
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
     }
 
     public int getChances() {
@@ -116,14 +110,19 @@ class Game {
     private int size;
     private final static Dice d = new Dice(22);  // 1 - 21
     private final static ArrayList<tile> carpet = new ArrayList<>();
-    private final static String cardinal[] = {"first", "second", "third", "fourth", "fifth"};
+    private final static String ordinal[] = {"first", "second", "third", "fourth", "fifth"};
     static Scanner sc = new Scanner(System.in);
 
     public Game(int size) {
         // Create carpet tiles
+        System.out.print("Hit enter to initialize the game");
+        sc.nextLine();
+
         player = new Player();
         this.size = size;  // Initial size of the board by default
-        carpet.add(new tile(new toy("Teddy")));
+
+        // Creating and adding all the tile objects with toys
+        carpet.add(new tile(new toy("Lion")));
         carpet.add(new tile(new toy("Barbie")));
         carpet.add(new tile(new toy("Flash")));
         carpet.add(new tile(new toy("Doraemon")));
@@ -132,10 +131,10 @@ class Game {
         carpet.add(new tile(new toy("Shin Chan")));
         carpet.add(new tile(new toy("Ball")));
         carpet.add(new tile(new toy("Dog")));
-        carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
-        carpet.add(new tile(new toy("Teddy")));
+        carpet.add(new tile(new toy("Batman")));
+        carpet.add(new tile(new toy("Superman")));
+        carpet.add(new tile(new toy("Mr. Bean")));
+        carpet.add(new tile(new toy("Teddy Bear")));
         carpet.add(new tile(new toy("Teddy")));
         carpet.add(new tile(new toy("Teddy")));
         carpet.add(new tile(new toy("Teddy")));
@@ -144,13 +143,10 @@ class Game {
         carpet.add(new tile(new toy("Teddy")));
         carpet.add(new tile(new toy("Teddy")));
 
-        System.out.print("Hit enter to initialize the game");
-        sc.nextLine();
         System.out.println("Game is ready");
         boolean game_over = false;
         while (!game_over) {
             play();
-            System.out.println();
             if (player.getChances() == 0) {
                 int i;
                 game_over = true;
@@ -183,7 +179,6 @@ class Game {
                     int result;
                     while (!b) {
                         try {
-                            //int x = sc.nextInt(), y = sc.nextInt();
                             // Generate 2 random integers.
                             d1.roll();
                             int first = d1.getValue();
@@ -203,12 +198,10 @@ class Game {
                     }
                 } else if (input.equalsIgnoreCase("string")) {
                     boolean b = false;
-                    String result;
                     while (!b) {
                         try {
                             b = true;
-                            int lowerbound = 65; // letter 'A'
-                            int upperbound = 90; // letter 'Z'
+                            int lowerbound = 65, upperbound = 90; // 'A' - 'Z'
                             int maxLength = 4;
                             Random random = new Random();
                             StringBuilder str = new StringBuilder(maxLength);
@@ -228,8 +221,7 @@ class Game {
 
                             System.out.println("Calculate the concatenation of strings " + generated1 + " " + generated2);
                             String answer = sc.nextLine();
-                            Calculator<String, String> calculator = new Calculator<String, String>(generated1, generated2);
-                            System.out.println(calculator.getResult());
+                            Calculator<String, String> calculator = new Calculator<>(generated1, generated2);
                             return (((String) calculator.getResult()).equals(answer));
                         } catch (InputMismatchException e) {
                             System.out.println(e);
@@ -248,8 +240,7 @@ class Game {
     }
 
     public static void play() {
-        boolean play = false;
-        System.out.println("Hit enter for your " + cardinal[(5 - player.getChances())] + " hop");
+        System.out.print("Hit enter for your " + ordinal[(5 - player.getChances())] + " hop");
         sc.nextLine();
         d.roll();
         if (d.getValue() > 20) {
@@ -263,6 +254,7 @@ class Game {
                     System.out.println("You won a " + t.getName() + " toy");
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
+                    sc.nextLine();
                 }
             } else {  // Question on a odd tile.
                 if (solveQuestion()) {
@@ -273,6 +265,7 @@ class Game {
                         System.out.println("You won a " + t.getName() + " toy");
                     } catch (CloneNotSupportedException e) {
                         e.printStackTrace();
+                        sc.nextLine();
                     }
                 } else {
                     System.out.println("Incorrect answer\nYou didn't win any soft toy.");
