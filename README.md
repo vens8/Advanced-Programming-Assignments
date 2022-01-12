@@ -1,4 +1,3 @@
 # Advanced-Programming-Assignments
 
-IIITD
-Roll number: 2020149
+Java OOPs assignments in the Advanced Programming Course at IIITD
